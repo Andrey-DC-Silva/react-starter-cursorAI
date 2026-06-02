@@ -11,10 +11,10 @@ export async function SiteHeader() {
         <Link href="/" className="text-lg font-semibold">
           React Starter
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
+        <nav className="flex items-center gap-4 text-sm">>
           {user ? (
             <>
-              <span className="text-[var(--muted)]">{user.email}</span>
+              <span className="text-[var(--muted)]">{user.email}</spans>
               {user.role === "ADMIN" ? (
                 <Link href="/admin" className="hover:underline">
                   Admin
