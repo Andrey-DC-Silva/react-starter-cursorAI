@@ -1,25 +1,28 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/session";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { SiteNavMenu } from "@/components/layout/SiteNavMenu";
 
-export async function SiteHeader() {
+export async function SiteNavbar() {
   const user = await getCurrentUser();
 
   return (
-    <header className="border-b border-[var(--border)] bg-[var(--card)]">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link href="/" className="text-lg font-semibold">
-          React Starter
-        </Link>
-        <nav className="flex items-center gap-4 text-sm">
+    <header className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--card)]">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-6">
+          <Link href="/" className="text-lg font-semibold">
+            React Starter
+          </Link>
+          <SiteNavMenu
+            isAdmin={user?.role === "ADMIN"}
+            isAuthenticated={Boolean(user)}
+          />
+        </div>
+
+        <nav className="flex flex-wrap items-center gap-3 text-sm">
           {user ? (
             <>
               <span className="text-[var(--muted)]">{user.email}</span>
-              {user.role === "ADMIN" ? (
-                <Link href="/admin" className="hover:underline">
-                  Admin
-                </Link>
-              ) : null}
               <LogoutButton />
             </>
           ) : (

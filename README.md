@@ -26,9 +26,10 @@ react-starter/
 │   │   ├── admin/         # Painel administrativo
 │   │   └── api/           # REST API
 │   ├── components/        # UI reutilizável
-│   │   ├── admin/
+│   │   ├── admin/         # AdminNavbar
 │   │   ├── auth/
-│   │   ├── layout/
+│   │   ├── users/         # UserProfileCrud, UserAdminCrud
+│   │   ├── layout/        # SiteNavbar, NavLink
 │   │   └── ui/
 │   ├── lib/               # Infraestrutura
 │   │   ├── auth/          # JWT, sessão, guards
@@ -42,7 +43,26 @@ react-starter/
 ## Pré-requisitos
 
 - Node.js 20+
-- PostgreSQL em execução
+- PostgreSQL em execução (opcional com modo de teste)
+
+## Modo de teste (sem banco de dados)
+
+Para desenvolver e testar sem PostgreSQL, ative no `.env`:
+
+```env
+AUTH_TEST_MODE="true"
+```
+
+Isso **só funciona fora de produção** (`NODE_ENV !== "production"`). Login, registro, sessão e painel admin usam usuários em memória.
+
+| Conta | E-mail | Senha | Papel |
+|-------|--------|-------|-------|
+| Admin | `admin@test.local` | `test123` | ADMIN |
+| User | `user@test.local` | `test123` | USER |
+
+Na página de login aparecem botões **Entrar como Admin** / **Entrar como User**. Cadastros novos ficam em memória até reiniciar o servidor.
+
+Para usar o banco real, defina `AUTH_TEST_MODE="false"` e siga a configuração abaixo.
 
 ## Configuração
 
@@ -58,13 +78,13 @@ npm install
 cp .env.example .env
 ```
 
-3. Aplique o schema e gere o client Prisma:
+3. *(Opcional se `AUTH_TEST_MODE=true`)* Aplique o schema e gere o client Prisma:
 
 ```bash
 npm run db:push
 ```
 
-4. Crie o usuário administrador:
+4. *(Opcional)* Crie o usuário administrador:
 
 ```bash
 npm run db:seed
@@ -91,7 +111,18 @@ Todas as respostas seguem `{ success, data }` ou `{ success: false, error: { cod
 | POST | `/api/auth/login` | Login (define cookie JWT) |
 | POST | `/api/auth/logout` | Logout |
 | GET | `/api/auth/me` | Usuário autenticado |
+| GET | `/api/users/me` | Perfil do usuário autenticado |
+| PATCH | `/api/users/me` | Atualiza perfil (nome, e-mail, senha) |
+| DELETE | `/api/users/me` | Exclui a própria conta |
 | GET | `/api/admin/users` | Lista usuários (ADMIN) |
+| POST | `/api/admin/users` | Cria usuário `{ email, password, name?, role? }` (ADMIN) |
+| GET | `/api/admin/users/:id` | Detalhe do usuário (ADMIN) |
+| PATCH | `/api/admin/users/:id` | Atualiza usuário incluindo papel (ADMIN) |
+| DELETE | `/api/admin/users/:id` | Remove usuário (ADMIN) |
+| GET | `/api/todos` | Lista tarefas do usuário autenticado |
+| POST | `/api/todos` | Cria tarefa `{ "title": "..." }` |
+| PATCH | `/api/todos/:id` | Atualiza `{ "title"?, "completed"? }` |
+| DELETE | `/api/todos/:id` | Remove tarefa |
 
 Autenticação na API: cookie `access_token` ou header `Authorization: Bearer <token>`.
 

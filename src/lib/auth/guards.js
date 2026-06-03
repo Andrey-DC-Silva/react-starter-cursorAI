@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
 import { getTokenPayloadFromRequest } from "@/lib/auth/session";
+import { findUserById } from "@/lib/auth/user-repository";
 
 export async function requireAuth(request) {
   const payload = await getTokenPayloadFromRequest(request);
@@ -8,17 +8,7 @@ export async function requireAuth(request) {
     return { error: "UNAUTHORIZED", status: 401 };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: payload.sub },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+  const user = await findUserById(payload.sub);
 
   if (!user) {
     return { error: "UNAUTHORIZED", status: 401 };

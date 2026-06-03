@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { AdminHeader } from "@/components/admin/AdminHeader";
-import { AdminShell } from "@/components/admin/AdminShell";
+import { AdminNavbar } from "@/components/admin/AdminNavbar";
 import { getCurrentUser } from "@/lib/auth/session";
 
 export const metadata = {
@@ -20,8 +19,8 @@ export default async function AdminLayout({ children }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AdminHeader user={user} />
-      <AdminShell>{children}</AdminShell>
+      <AdminNavbar user={user} />
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
     </div>
   );
 }

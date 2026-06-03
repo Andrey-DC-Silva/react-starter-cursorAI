@@ -1,8 +1,6 @@
 import { jsonError, jsonSuccess } from "@/lib/api/response";
-import { hashPassword } from "@/lib/auth/password";
 import { setAccessTokenCookie } from "@/lib/auth/session";
-import { prisma } from "@/lib/prisma";
-import { sanitizeUser } from "@/lib/user";
+import { createUser } from "@/lib/auth/user-repository";
 import {
   formatZodError,
   registerSchema,
@@ -18,26 +16,15 @@ export async function POST(request) {
     }
 
     const { email, password, name } = parsed.data;
+    const result = await createUser({ email, password, name });
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
+    if (result.error === "EMAIL_EXISTS") {
       return jsonError("E-mail já cadastrado", 409, "EMAIL_EXISTS");
     }
 
-    const hashedPassword = await hashPassword(password);
+    await setAccessTokenCookie(result.user);
 
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name: name ?? null,
-        role: "USER",
-      },
-    });
-
-    await setAccessTokenCookie(user);
-
-    return jsonSuccess({ user: sanitizeUser(user) }, 201);
+    return jsonSuccess({ user: result.user }, 201);
   } catch (error) {
     console.error("[POST /api/auth/register]", error);
     return jsonError("Erro interno do servidor", 500, "INTERNAL_ERROR");

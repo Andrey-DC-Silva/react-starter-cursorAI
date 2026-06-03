@@ -4,7 +4,7 @@ import {
   TOKEN_COOKIE_OPTIONS,
 } from "@/lib/auth/constants";
 import { signAccessToken, verifyAccessToken } from "@/lib/auth/jwt";
-import { prisma } from "@/lib/prisma";
+import { findUserById } from "@/lib/auth/user-repository";
 
 export function buildTokenPayload(user) {
   return {
@@ -47,17 +47,7 @@ export async function getCurrentUser() {
       return null;
     }
 
-    return prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    return findUserById(userId);
   } catch {
     return null;
   }

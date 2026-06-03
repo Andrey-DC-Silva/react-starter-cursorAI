@@ -1,8 +1,6 @@
 import { jsonError, jsonSuccess } from "@/lib/api/response";
-import { verifyPassword } from "@/lib/auth/password";
 import { setAccessTokenCookie } from "@/lib/auth/session";
-import { prisma } from "@/lib/prisma";
-import { sanitizeUser } from "@/lib/user";
+import { authenticateUser } from "@/lib/auth/user-repository";
 import { formatZodError, loginSchema } from "@/lib/validators/auth";
 
 export async function POST(request) {
@@ -15,20 +13,15 @@ export async function POST(request) {
     }
 
     const { email, password } = parsed.data;
+    const user = await authenticateUser(email, password);
 
-    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return jsonError("Credenciais inválidas", 401, "INVALID_CREDENTIALS");
-    }
-
-    const isValidPassword = await verifyPassword(password, user.password);
-    if (!isValidPassword) {
       return jsonError("Credenciais inválidas", 401, "INVALID_CREDENTIALS");
     }
 
     await setAccessTokenCookie(user);
 
-    return jsonSuccess({ user: sanitizeUser(user) });
+    return jsonSuccess({ user });
   } catch (error) {
     console.error("[POST /api/auth/login]", error);
     return jsonError("Erro interno do servidor", 500, "INTERNAL_ERROR");

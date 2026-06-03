@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteNavbar } from "@/components/layout/SiteNavbar";
 import { Card } from "@/components/ui/Card";
 import { getCurrentUser } from "@/lib/auth/session";
 
@@ -8,7 +8,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <SiteHeader />
+      <SiteNavbar />
       <main className="mx-auto max-w-6xl px-4 py-12">
         <div className="max-w-2xl space-y-6">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -22,6 +22,7 @@ export default async function HomePage() {
 
           <Card title="Sua sessão">
             {user ? (
+              <>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between gap-4">
                   <dt className="text-[var(--muted)]">E-mail</dt>
@@ -32,6 +33,15 @@ export default async function HomePage() {
                   <dd>{user.role}</dd>
                 </div>
               </dl>
+              <p className="mt-4 flex flex-wrap gap-4 text-sm">
+                <Link href="/todos" className="text-[var(--primary)] hover:underline">
+                  Tarefas →
+                </Link>
+                <Link href="/profile" className="text-[var(--primary)] hover:underline">
+                  Meu perfil →
+                </Link>
+              </p>
+              </>
             ) : (
               <p className="text-sm text-[var(--muted)]">
                 Você não está autenticado.{" "}
@@ -55,6 +65,13 @@ export default async function HomePage() {
               <li>POST /api/auth/logout</li>
               <li>GET /api/auth/me</li>
               <li>GET /api/admin/users (ADMIN)</li>
+              <li>GET /api/todos (auth)</li>
+              <li>POST /api/todos (auth)</li>
+              <li>PATCH /api/todos/:id (auth)</li>
+              <li>DELETE /api/todos/:id (auth)</li>
+              <li>GET/PATCH/DELETE /api/users/me (auth)</li>
+              <li>POST /api/admin/users (ADMIN)</li>
+              <li>GET/PATCH/DELETE /api/admin/users/:id (ADMIN)</li>
             </ul>
           </Card>
         </div>
